@@ -277,3 +277,82 @@ button:hover {
 .month-accordion-btn.active::after {
     transform: rotate(180deg);
 }
+
+/* --- 📱 DISEÑO RESPONSIVO (MEDIA QUERIES) --- */
+
+/* 1. Tablets y Pantallas Medianas (Hasta 1024px) */
+@media (max-width: 1024px) {
+    body {
+        overflow-y: auto; /* Permitimos el scroll general en móviles */
+        height: auto;
+    }
+
+    .dashboard-container {
+        grid-template-columns: 1fr; /* Pasa a ser una sola columna limpia */
+        grid-template-rows: auto;
+        height: auto;
+        width: 100%;
+    }
+
+    /* Modificamos los sidebars para que ocupen todo el ancho */
+    .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 24px;
+        height: auto;
+        overflow-y: visible;
+    }
+
+    .sidebar-right {
+        border-left: none;
+        border-top: 1px solid var(--border);
+    }
+
+    .main-content {
+        padding: 24px;
+        height: auto;
+        overflow-y: visible;
+    }
+
+    /* El historial ya no necesita crecer infinitamente en móvil */
+    .history-list {
+        overflow-y: visible;
+        max-height: none;
+    }
+}
+
+/* 2. Smartphones (Hasta 640px) */
+@media (max-width: 640px) {
+    .main-content {
+        padding: 20px 16px;
+        gap: 20px;
+    }
+
+    .sidebar {
+        padding: 24px 16px;
+    }
+
+    /* Las tarjetas del dashboard pasan a ocupar el 100% (1 por fila) */
+    .widgets-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .card-full {
+        grid-column: span 1; /* Ya no se estira doble */
+    }
+
+    /* Achicamos un pelín las métricas para que no rompan en pantallas chicas */
+    .metric {
+        font-size: 1.8rem;
+    }
+
+    h1 {
+        font-size: 1.5rem !important;
+    }
+
+    /* Hacemos los botones de los meses un poco más altos para tocarlos fácil */
+    .month-accordion-btn {
+        padding: 14px;
+    }
+}
