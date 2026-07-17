@@ -1,6 +1,31 @@
-let budget = parseFloat(localStorage.getItem('pro_budget')) || 0;
+// 1. Obtener de forma dinámica el año y mes actual (ej: "2026-07")
+const ahora = new Date();
+const mesActualKey = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}`;
+
+// 2. Cargar datos desde LocalStorage amarrados estrictamente al mes actual
+let budget = parseFloat(localStorage.getItem(`pro_budget_${mesActualKey}`)) || 0;
 let expenses = JSON.parse(localStorage.getItem('pro_expenses')) || [];
 
+// Si no hay presupuesto mensual pero existía uno viejo general (de tus pruebas locales), lo migramos
+if (budget === 0 && localStorage.getItem('pro_budget')) {
+    budget = parseFloat(localStorage.getItem('pro_budget')) || 0;
+    localStorage.setItem(`pro_budget_${mesActualKey}`, budget);
+}
+
+// Parche automático para gastos viejos sin fecha
+let huboCambios = false;
+expenses = expenses.map(item => {
+    if (!item.date) {
+        item.date = mesActualKey; 
+        huboCambios = true;
+    }
+    return item;
+});
+if (huboCambios) {
+    localStorage.setItem('pro_expenses', JSON.stringify(expenses));
+}
+
+// 3. Capturas de Elementos del DOM
 const budgetInput = document.getElementById('budget-input');
 const balanceDisplay = document.getElementById('balance-display');
 const spentDisplay = document.getElementById('spent-display');
@@ -12,33 +37,18 @@ const expenseList = document.getElementById('expense-list');
 const filterCategory = document.getElementById('filter-category');
 const expenseForm = document.getElementById('expense-form');
 
-const ahora = new Date();
-const mesActualKey = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}`;
-
-let huboCambios = false;
-expenses = expenses.map(item => {
-    if (!item.date) {
-        item.date = "2026-07"; 
-        huboCambios = true;
-    }
-    return item;
-});
-if (huboCambios) {
-    localStorage.setItem('pro_expenses', JSON.stringify(expenses));
-}
-
-if (budget === 0 && localStorage.getItem('pro_budget')) {
-    budget = parseFloat(localStorage.getItem('pro_budget')) || 0;
-    localStorage.setItem(`pro_budget_${mesActualKey}`, budget);
-}
-
+// Renderizado inicial automático apenas carga la página
 updateUI();
 
+// 4. Funciones de Control
 function setBudget() {
     const val = parseFloat(budgetInput.value);
     if (!isNaN(val) && val >= 0) {
         budget = val;
+        
+        // Guardamos con la clave mensual del mes en curso
         localStorage.setItem(`pro_budget_${mesActualKey}`, budget);
+        
         budgetInput.value = '';
         updateUI();
     }
@@ -63,17 +73,14 @@ expenseForm.addEventListener('submit', (e) => {
     updateUI();
 });
 
-
 function deleteExpense(id) {
-
     expenses = expenses.filter(item => item.id !== id);
-
     localStorage.setItem('pro_expenses', JSON.stringify(expenses));
-    
     updateUI();
 }
 
 function updateUI() {
+    // Las métricas de las tarjetas principales calculan SOLO el mes en curso
     const gastosDelMesActual = expenses.filter(item => item.date === mesActualKey);
     const totalSpent = gastosDelMesActual.reduce((sum, item) => sum + item.amount, 0);
     const balance = budget - totalSpent;
