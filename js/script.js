@@ -12,6 +12,25 @@ const expenseList = document.getElementById('expense-list');
 const filterCategory = document.getElementById('filter-category');
 const expenseForm = document.getElementById('expense-form');
 
+const ahora = new Date();
+const mesActualKey = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}`;
+
+let huboCambios = false;
+expenses = expenses.map(item => {
+    if (!item.date) {
+        item.date = "2026-07"; 
+        huboCambios = true;
+    }
+    return item;
+});
+if (huboCambios) {
+    localStorage.setItem('pro_expenses', JSON.stringify(expenses));
+}
+
+if (budget === 0 && localStorage.getItem('pro_budget')) {
+    budget = parseFloat(localStorage.getItem('pro_budget')) || 0;
+    localStorage.setItem(`pro_budget_${mesActualKey}`, budget);
+}
 
 updateUI();
 
@@ -19,9 +38,7 @@ function setBudget() {
     const val = parseFloat(budgetInput.value);
     if (!isNaN(val) && val >= 0) {
         budget = val;
-        
-        localStorage.setItem('pro_budget', budget); //persistencia de datos
-        
+        localStorage.setItem(`pro_budget_${mesActualKey}`, budget);
         budgetInput.value = '';
         updateUI();
     }
@@ -33,16 +50,32 @@ expenseForm.addEventListener('submit', (e) => {
     const amount = parseFloat(document.getElementById('expense-amount').value);
     const category = document.getElementById('expense-category').value;
 
-    expenses.push({ id: Date.now(), name, amount, category });
+    expenses.push({ 
+        id: Date.now(), 
+        name, 
+        amount, 
+        category,
+        date: mesActualKey 
+    });
     
     localStorage.setItem('pro_expenses', JSON.stringify(expenses));
-    
     expenseForm.reset();
     updateUI();
 });
 
+
+function deleteExpense(id) {
+
+    expenses = expenses.filter(item => item.id !== id);
+
+    localStorage.setItem('pro_expenses', JSON.stringify(expenses));
+    
+    updateUI();
+}
+
 function updateUI() {
-    const totalSpent = expenses.reduce((sum, item) => sum + item.amount, 0);
+    const gastosDelMesActual = expenses.filter(item => item.date === mesActualKey);
+    const totalSpent = gastosDelMesActual.reduce((sum, item) => sum + item.amount, 0);
     const balance = budget - totalSpent;
 
     balanceDisplay.innerText = `$${balance.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
@@ -64,7 +97,9 @@ function updateUI() {
     else progressBar.style.backgroundColor = 'var(--primary)';
 
     if (budget === 0) {
-        healthBox.innerText = "Establecé un presupuesto inicial para comenzar el análisis automatizado de flujo.";
+        const opciones = { month: 'long' };
+        const nombreMesActual = ahora.toLocaleDateString('es-AR', opciones);
+        healthBox.innerText = `Asigná el presupuesto inicial de ${nombreMesActual.charAt(0).toUpperCase() + nombreMesActual.slice(1)} para comenzar el análisis del estado de tus cuentas.`;
     } else if (balance < 0) {
         healthBox.innerHTML = "⚠️ <strong style='color:var(--danger)'>Déficit crítico:</strong> Has sobrepasado los fondos asignados. Detener gastos superfluos.";
     } else if (percent > 80) {
@@ -73,27 +108,27 @@ function updateUI() {
         healthBox.innerHTML = "✅ <strong style='color:var(--success)'>Flujo Estable:</strong> Tus consumos se mantienen dentro de los márgenes previstos.";
     }
 
-    renderCategoryMetrics();
+    renderCategoryMetrics(gastosDelMesActual);
     renderExpenses();
 }
 
-function renderCategoryMetrics() {
-    const cats = ['Comida', 'Transporte', 'Entretenimiento', 'Otros'];
+function renderCategoryMetrics(gastosMes) {
+    const cats = ['Comida', 'Transporte', 'Entretenimiento', 'Tarjeta de Credito', 'Otros'];
     categoriesSummary.innerHTML = '';
 
-    if (expenses.length === 0) {
-        categoriesSummary.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Sin consumos registrados.</p>';
+    if (gastosMes.length === 0) {
+        categoriesSummary.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Sin consumos registrados este mes.</p>';
         return;
     }
 
     cats.forEach(c => {
-        const totalCat = expenses.filter(i => i.category === c).reduce((s, i) => s + i.amount, 0);
+        const totalCat = gastosMes.filter(i => i.category === c).reduce((s, i) => s + i.amount, 0);
         if (totalCat > 0) {
             const div = document.createElement('div');
             div.className = 'category-row';
             div.innerHTML = `
-                <span class="cat-tag cat-${c}">${c}</span>
-                <strong style="color: var(--text-main); font-size:0.95rem;">$${totalCat.toFixed(2)}</strong>
+                <span class="cat-tag cat-${c.replace(/ /g, "")}">${c}</span>
+                <strong style="color: var(--text-main); font-size:0.95rem;">$${totalCat.toLocaleString('es-AR', {minimumFractionDigits: 2})}</strong>
             `;
             categoriesSummary.appendChild(div);
         }
@@ -110,16 +145,64 @@ function renderExpenses() {
         return;
     }
 
-    filtered.reverse().forEach(item => {
-        const li = document.createElement('li');
-        li.className = 'history-item';
-        li.innerHTML = `
-            <div>
-                <span style="font-weight: 500; font-size:0.9rem; display:block; color:var(--text-main);">${item.name}</span>
-                <span class="cat-tag cat-${item.category}" style="font-size:0.65rem; padding: 2px 6px; margin-top:4px; display:inline-block;">${item.category}</span>
-            </div>
-            <span style="font-weight: 600; color: var(--danger); font-size:0.95rem;">-$${item.amount.toFixed(2)}</span>
-        `;
-        expenseList.appendChild(li);
+    const gruposPorMes = {};
+    [...filtered].reverse().forEach(item => {
+        const mes = item.date || "Historial general";
+        if (!gruposPorMes[mes]) {
+            gruposPorMes[mes] = [];
+        }
+        gruposPorMes[mes].push(item);
+    });
+
+    Object.keys(gruposPorMes).sort().reverse().forEach(mes => {
+        let nombreMes = mes;
+        const [anio, numeroMes] = mes.split('-');
+        
+        if (numeroMes) {
+            nombreMes = new Date(anio, numeroMes - 1).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+            nombreMes = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1);
+        }
+
+        const containerLi = document.createElement('li');
+        containerLi.style.width = '100%';
+
+        const btnMes = document.createElement('button');
+        btnMes.className = 'month-accordion-btn';
+        btnMes.innerHTML = `<span>📅 ${nombreMes}</span>`;
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'month-content';
+        
+        if (mes === mesActualKey) {
+            btnMes.classList.add('active');
+            contentDiv.classList.add('open');
+        }
+
+        gruposPorMes[mes].forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'history-item';
+            itemDiv.innerHTML = `
+                <div>
+                    <span style="font-weight: 500; font-size:0.9rem; display:block; color:var(--text-main);">${item.name}</span>
+                    <span class="cat-tag cat-${item.category.replace(/ /g, "")}" style="font-size:0.65rem; padding: 2px 6px; margin-top:4px; display:inline-block;">${item.category}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-weight: 600; color: var(--danger); font-size:0.95rem;">-$${item.amount.toFixed(2)}</span>
+                    <button onclick="deleteExpense(${item.id})" style="background: none; border: none; padding: 4px; width: auto; cursor: pointer; font-size: 1rem; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
+                        🗑️
+                    </button>
+                </div>
+            `;
+            contentDiv.appendChild(itemDiv);
+        });
+
+        btnMes.addEventListener('click', () => {
+            btnMes.classList.toggle('active');
+            contentDiv.classList.toggle('open');
+        });
+
+        containerLi.appendChild(btnMes);
+        containerLi.appendChild(contentDiv);
+        expenseList.appendChild(containerLi);
     });
 }
