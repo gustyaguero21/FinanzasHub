@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Financiero Interactivo</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+    <div class="dashboard-container">  
+        <aside class="sidebar">
+            <div>
+                <div class="brand">💰 FinanzasHub</div>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Gestión de activos en tiempo real.</p>
+            </div>
+            <div>
+                <h2>Presupuesto</h2>
+                <div class="input-group">
+                    <label for="budget-input">Establecer Capital Inicial</label>
+                    <input type="number" id="budget-input" placeholder="Monto en $" >
+                </div>
+                <button onclick="setBudget()">Inyectar Fondos</button>
+            </div>
+            <div>
+                <h2>Registrar Gasto</h2>
+                <form id="expense-form">
+                    <div class="input-group">
+                        <label for="expense-name">Concepto</label>
+                        <input type="text" id="expense-name" placeholder="Ej. Supermercado, Nafta..." required>
+                    </div>
+                    <div class="input-group">
+                        <label for="expense-amount">Monto</label>
+                        <input type="number" id="expense-amount" placeholder="$" required min="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="expense-category">Categoría</label>
+                        <select id="expense-category">
+                            <option value="Comida">🍔 Comida</option>
+                            <option value="Transporte">🚗 Transporte</option>
+                            <option value="Entretenimiento">🎬 Entretenimiento</option>
+                            <option value="Tarjeta de Credito">💳 Tarjeta de Crédito</option>
+                            <option value="Otros">📦 Otros</option>
+                        </select>
+                    </div>
+                    <button type="submit" style="background-color: #1f2937;">Guardar Gasto</button>
+                </form>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div>
+                <h1 style="font-size: 1.75rem; font-weight: 700;">Dashboard</h1>
+                <p style="color: var(--text-muted);">Análisis situacional de tus fondos consumidos.</p>
+            </div>
+
+            <div class="widgets-grid">
+                <div class="card">
+                    <label>FONDO DISPONIBLE</label>
+                    <div class="metric" id="balance-display" style="color: var(--success);">$0.00</div>
+                </div>
+
+                <div class="card">
+                    <label>TOTAL CONSUMIDO</label>
+                    <div class="metric" id="spent-display" style="color: var(--text-main);">$0.00</div>
+                </div>
+
+                <div class="card card-full">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label>NIVEL DE GASTO DE TU CAPITAL</label>
+                        <span id="progress-percent" style="font-weight: 600; font-size: 0.9rem;">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>Distribución de Gastos</h2>
+                    <div id="categories-summary">
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Sin consumos registrados.</p>
+                    </div>
+                </div>
+                <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <h2>Salud Financiera</h2>
+                    <div class="hint-box" id="health-box">
+                        Asigná un presupuesto inicial para comenzar el análisis del estado de tus cuentas.
+                    </div>
+                </div>
+            </div>
+        </main>
+        <aside class="sidebar sidebar-right">
+            <div>
+                <h2>Flujo de Caja</h2>
+                <div class="input-group">
+                    <label for="filter-category">Filtrar Historial</label>
+                    <select id="filter-category" onchange="renderExpenses()">
+                        <option value="Todos">🔎 Mostrar Todos</option>
+                        <option value="Comida">Comida</option>
+                        <option value="Transporte">Transporte</option>
+                        <option value="Entretenimiento">Entretenimiento</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+            </div>
+            <ul class="history-list" id="expense-list">
+            </ul>
+        </aside>
+
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
