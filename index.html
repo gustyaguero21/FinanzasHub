@@ -3,100 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Financiero Interactivo</title>
+    <title>Mis Finanzas</title>
     <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
     <div class="dashboard-container">  
         <aside class="sidebar">
-            <div>
-                <div class="brand">💰 FinanzasHub</div>
-                <p style="color: var(--text-muted); font-size: 0.85rem;">Gestión de activos en tiempo real.</p>
-            </div>
-            <div>
-                <h2>Presupuesto</h2>
-                <div class="input-group">
-                    <label for="budget-input">Establecer Capital Inicial</label>
-                    <input type="number" id="budget-input" placeholder="Monto en $" >
+            <div class="brand-header">
+                <div class="brand-icon">💰</div>
+                <div>
+                    <div class="brand">Mis Finanzas</div>
+                    <p class="brand-sub">Tu billetera clara y ordenada</p>
                 </div>
-                <button onclick="setBudget()">Inyectar Fondos</button>
             </div>
-            <div>
-                <h2>Registrar Gasto</h2>
+            <div class="section-box">
+                <h2>1. Paso Uno: Tu Dinero</h2>
+                <div class="input-group">
+                    <label for="budget-input">¿Cuánto dinero tenés hoy?</label>
+                    <input type="number" id="budget-input" placeholder="Ejemplo: 50000">
+                </div>
+                <button onclick="setBudget()">Ingresa tu sueldo</button>
+            </div>
+            <div class="section-box">
+                <h2>2. Paso Dos: Anotar un Gasto</h2>
                 <form id="expense-form">
                     <div class="input-group">
-                        <label for="expense-name">Concepto</label>
-                        <input type="text" id="expense-name" placeholder="Ej. Supermercado, Nafta..." required>
+                        <label for="expense-name">¿En qué gastaste?</label>
+                        <input type="text" id="expense-name" placeholder="Ej. Supermercado, Panadería..." required>
                     </div>
                     <div class="input-group">
-                        <label for="expense-amount">Monto</label>
-                        <input type="number" id="expense-amount" placeholder="$" required min="1">
+                        <label for="expense-amount">¿Cuánto te costó en total?</label>
+                        <input type="number" id="expense-amount" placeholder="Monto en $" required min="1">
                     </div>
                     <div class="input-group">
-                        <label for="expense-category">Categoría</label>
+                        <label for="expense-category">¿Qué tipo de gasto es?</label>
                         <select id="expense-category">
-                            <option value="Comida">🍔 Comida</option>
-                            <option value="Transporte">🚗 Transporte</option>
-                            <option value="Entretenimiento">🎬 Entretenimiento</option>
-                            <option value="Tarjeta de Credito">💳 Tarjeta de Crédito</option>
-                            <option value="Otros">📦 Otros</option>
+                            <option value="Comida">🍔 Comida y Almacén</option>
+                            <option value="Transporte">🚗 Pasajes y Viajes</option>
+                            <option value="Entretenimiento">🎬 Salidas</option>
+                            <option value="Tarjeta de Credito">💳 Pago de Tarjeta</option>
+                            <option value="Otros">📦 Otros gastos</option>
                         </select>
                     </div>
-                    <button type="submit" style="background-color: #1f2937;">Guardar Gasto</button>
+                    <button type="submit" class="btn-dark">Guardar este Gasto</button>
                 </form>
             </div>
         </aside>
-
         <main class="main-content">
-            <div>
-                <h1 style="font-size: 1.75rem; font-weight: 700;">Dashboard</h1>
-                <p style="color: var(--text-muted);">Análisis situacional de tus fondos consumidos.</p>
-            </div>
+            <header class="main-header">
+                <div>
+                    <h1>Resumen de tu Dinero</h1>
+                    <p class="subtitle">Mirá aquí cuánto te queda y en qué lo usaste.</p>
+                </div>
+            </header>
 
             <div class="widgets-grid">
                 <div class="card">
-                    <label>FONDO DISPONIBLE</label>
-                    <div class="metric" id="balance-display" style="color: var(--success);">$0.00</div>
+                    <div class="card-header">
+                        <label>Lo que te queda libre</label>
+                        <span class="status-badge badge-success">Disponible</span>
+                    </div>
+                    <div class="metric metric-balance" id="balance-display">$0.00</div>
+                    <span class="card-subtext">Dinero que aún podés usar</span>
                 </div>
-
                 <div class="card">
-                    <label>TOTAL CONSUMIDO</label>
-                    <div class="metric" id="spent-display" style="color: var(--text-main);">$0.00</div>
+                    <div class="card-header">
+                        <label>Dinero que ya gastaste</label>
+                        <span class="status-badge badge-neutral">Suma total</span>
+                    </div>
+                    <div class="metric" id="spent-display">$0.00</div>
+                    <span class="card-subtext">Total gastado hasta el momento</span>
                 </div>
-
                 <div class="card card-full">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <label>NIVEL DE GASTO DE TU CAPITAL</label>
-                        <span id="progress-percent" style="font-weight: 600; font-size: 0.9rem;">0%</span>
+                    <div class="progress-header">
+                        <label>¿Cuánto gastaste de tu dinero?</label>
+                        <span id="progress-percent" class="percent-badge">0%</span>
                     </div>
                     <div class="progress-container">
                         <div class="progress-bar" id="progress-bar"></div>
                     </div>
                 </div>
                 <div class="card">
-                    <h2>Distribución de Gastos</h2>
+                    <h2>Gastos por Categoria</h2>
                     <div id="categories-summary">
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">Sin consumos registrados.</p>
+                        <p class="empty-state">Todavía no anotaste ningún gasto.</p>
                     </div>
                 </div>
-                <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-                    <h2>Salud Financiera</h2>
+                <div class="card">
+                    <h2>Consejo de tu Cuenta</h2>
                     <div class="hint-box" id="health-box">
-                        Asigná un presupuesto inicial para comenzar el análisis del estado de tus cuentas.
+                        Ingresá tu dinero inicial en el paso 1 para ver recomendaciones sobre tus compras.
                     </div>
                 </div>
             </div>
+
             <footer class="dashboard-footer">
-                <p>&copy; <span id="copy-year"></span> MCC. Todos los derechos reservados.</p>
+                <p>&copy; <span id="copy-year"></span> MalardosCodingClub derechos reservados</p>
             </footer>
         </main>
         <aside class="sidebar sidebar-right">
             <div>
-                <h2>Flujo de Caja</h2>
+                <h2>Lista de Gastos Anotados</h2>
                 <div class="input-group">
-                    <label for="filter-category">Filtrar Historial</label>
+                    <label for="filter-category">Ver solo una categoría:</label>
                     <select id="filter-category" onchange="renderExpenses()">
-                        <option value="Todos">🔎 Mostrar Todos</option>
+                        <option value="Todos">🔎 Ver todos los gastos</option>
                         <option value="Comida">Comida</option>
                         <option value="Transporte">Transporte</option>
                         <option value="Entretenimiento">Entretenimiento</option>
@@ -104,11 +115,12 @@
                     </select>
                 </div>
             </div>
+            
             <ul class="history-list" id="expense-list">
             </ul>
         </aside>
-
     </div>
+
     <script src="js/script.js"></script>
 </body>
 </html>
