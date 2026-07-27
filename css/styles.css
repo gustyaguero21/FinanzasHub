@@ -406,3 +406,79 @@ button:hover {
     .card-full { grid-column: span 1; }
     .metric { font-size: 1.9rem; }
 }
+
+/* --- DESPLEGABLE PERSONALIZADO --- */
+.custom-select-wrapper {
+    position: relative;
+    user-select: none;
+    width: 100%;
+}
+
+.custom-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 15px;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-main);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    min-height: 50px;
+    transition: all 0.2s ease;
+}
+
+.custom-select-trigger:hover,
+.custom-select-wrapper.open .custom-select-trigger {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.custom-select-trigger .arrow {
+    font-size: 0.75rem;
+    color: var(--text-subtle);
+    transition: transform 0.2s ease;
+}
+
+.custom-select-wrapper.open .arrow {
+    transform: rotate(180deg);
+}
+
+.custom-options {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background-color: var(--bg-sidebar);
+    border: 1px solid var(--border-hover);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.custom-select-wrapper.open .custom-options {
+    display: block;
+}
+
+.custom-option {
+    padding: 14px 16px;
+    font-size: 1rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.custom-option:hover {
+    background-color: var(--bg-card-hover);
+    color: var(--text-main);
+}
+
+.custom-option.selected {
+    background-color: rgba(99, 102, 241, 0.2);
+    color: var(--primary-light);
+    font-weight: 700;
+}

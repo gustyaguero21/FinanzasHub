@@ -37,13 +37,23 @@
                     </div>
                     <div class="input-group">
                         <label for="expense-category">¿Qué tipo de gasto es?</label>
-                        <select id="expense-category">
-                            <option value="Comida">🍔 Comida y Almacén</option>
-                            <option value="Transporte">🚗 Pasajes y Viajes</option>
-                            <option value="Entretenimiento">🎬 Salidas</option>
-                            <option value="Tarjeta de Credito">💳 Pago de Tarjeta</option>
-                            <option value="Otros">📦 Otros gastos</option>
-                        </select>
+                        <div class="input-group">
+                        <label>¿Qué tipo de gasto es?</label>
+                        <div class="custom-select-wrapper" id="custom-category-select">
+                            <div class="custom-select-trigger">
+                                <span>🍔 Comida y Almacén</span>
+                                <span class="arrow">▼</span>
+                            </div>
+                            <div class="custom-options">
+                                <div class="custom-option selected" data-value="Comida">🍔 Comida y Almacén</div>
+                                <div class="custom-option" data-value="Transporte">🚗 Pasajes y Viajes</div>
+                                <div class="custom-option" data-value="Entretenimiento">🎬 Salidas</div>
+                                <div class="custom-option" data-value="Tarjeta de Credito">💳 Pago de Tarjeta</div>
+                                <div class="custom-option" data-value="Otros">📦 Otros gastos</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="expense-category" value="Comida">
+                    </div>
                     </div>
                     <button type="submit" class="btn-dark">Guardar este Gasto</button>
                 </form>

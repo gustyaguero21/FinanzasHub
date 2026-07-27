@@ -213,3 +213,39 @@ function renderExpenses() {
         expenseList.appendChild(containerLi);
     });
 }
+
+// Lógica para el desplegable personalizado de categorías
+const customSelect = document.getElementById('custom-category-select');
+if (customSelect) {
+    const trigger = customSelect.querySelector('.custom-select-trigger');
+    const options = customSelect.querySelectorAll('.custom-option');
+    const hiddenInput = document.getElementById('expense-category');
+
+    // Abrir o cerrar menú al hacer clic en el disparador
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        customSelect.classList.toggle('open');
+    });
+
+    // Seleccionar opción
+    options.forEach(option => {
+        option.addEventListener('click', () => {
+            // Remover selección anterior
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Marcar la nueva opción
+            option.classList.add('selected');
+            trigger.querySelector('span').textContent = option.textContent;
+            
+            // Guardar valor en el input oculto que consume el formulario
+            hiddenInput.value = option.getAttribute('data-value');
+            
+            customSelect.classList.remove('open');
+        });
+    });
+
+    // Cierra el desplegable si hacés clic afuera
+    document.addEventListener('click', () => {
+        customSelect.classList.remove('open');
+    });
+}
